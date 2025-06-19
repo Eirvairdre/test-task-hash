@@ -1,0 +1,104 @@
+openapi: 3.0.0
+info:
+  title: Hash Service API
+  version: 1.0.0
+  description: API для сервиса хеширования строк
+servers:
+  - url: http://localhost:4000/api
+paths:
+  /auth/login:
+    get:
+      summary: Старт OAuth через Яндекс
+      responses:
+        '302':
+          description: Редирект на Яндекс
+  /auth/callback/yandex:
+    get:
+      summary: Callback от Яндекса
+      parameters:
+        - in: query
+          name: code
+          schema:
+            type: string
+          required: true
+      responses:
+        '302':
+          description: Редирект на главную страницу
+        '400':
+          description: Нет кода авторизации
+        '500':
+          description: Ошибка авторизации
+  /auth/logout:
+    post:
+      summary: Выход пользователя
+      responses:
+        '200':
+          description: ОК
+  /auth/me:
+    get:
+      summary: Информация о пользователе
+      responses:
+        '200':
+          description: Данные пользователя
+  /hash:
+    post:
+      summary: Хеширование строки
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                str:
+                  type: string
+                algo:
+                  type: string
+                  enum: [md5, sha1, sha256]
+      responses:
+        '200':
+          description: Хеш строки
+        '400':
+          description: Ошибка валидации
+        '429':
+          description: Превышен лимит запросов
+  /audit:
+    get:
+      summary: Получить аудит-логи (только для админа)
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+        - in: query
+          name: limit
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Список логов
+    delete:
+      summary: Очистить все логи (только для админа)
+      parameters:
+        - in: query
+          name: confirm
+          schema:
+            type: string
+            enum: [yes]
+      responses:
+        '200':
+          description: ОК
+        '400':
+          description: Требуется подтверждение
+  /audit/{id}:
+    delete:
+      summary: Удалить лог по id (только для админа)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: ОК 

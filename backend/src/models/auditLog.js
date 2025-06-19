@@ -1,6 +1,7 @@
+// Импорт подключения к базе данных
 const pool = require('./db');
 
-// Модель для работы с аудит-логами (журнал действий пользователей)
+// Модель для работы с аудит-логами
 const AuditLog = {
   // Записать событие в аудит-лог
   async create({ user_id, email, action, details, is_error = false }) {
@@ -9,7 +10,7 @@ const AuditLog = {
       [user_id, email, action, details, is_error]
     );
   },
-  // Получить список логов с пагинацией
+  // Получить все логи с пагинацией
   async getAll({ limit = 20, offset = 0 } = {}) {
     const [rows] = await pool.query(
       'SELECT * FROM audit_logs ORDER BY created_at DESC LIMIT ? OFFSET ?',

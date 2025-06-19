@@ -1,9 +1,11 @@
+// Импорт библиотеки для тестирования HTTP и приложения
 const request = require('supertest');
 const app = require('../src/app');
 
+// Тесты эндпоинта проверки работоспособности сервера
 describe('GET /health', () => {
+  // Проверка успешного ответа от сервера
   it('should return status ok', async () => {
-    // Проверяю, что healthcheck возвращает 200 и { status: 'ok' }
     const res = await request(app).get('/health');
     expect(res.statusCode).toBe(200);
     expect(res.body).toEqual({ status: 'ok' });
