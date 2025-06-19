@@ -1,0 +1,23 @@
+# Игнорировать зависимости и временные файлы во всех пакетах
+node_modules/
+backend/node_modules/
+frontend/node_modules/
+
+# Покрытие тестов
+coverage/
+backend/coverage/
+
+# Логи
+*.log
+backend/test.log
+
+# Служебные файлы IDE
+.idea/
+*.iml
+
+# Docker-артефакты
+*.pid
+
+# Прочее
+.env
+.DS_Store 
