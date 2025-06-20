@@ -6,6 +6,7 @@ const User = require('../models/user');
 const Session = require('../models/session');
 const AuditLog = require('../models/auditLog');
 const { getRole } = require('../middlewares/auth');
+const qs = require('querystring');
 
 const YANDEX_CLIENT_ID = process.env.YANDEX_CLIENT_ID;
 const YANDEX_CLIENT_SECRET = process.env.YANDEX_CLIENT_SECRET;
@@ -14,7 +15,7 @@ const SESSION_SECRET = process.env.SESSION_SECRET;
 
 // Роут для старта авторизации через Яндекс (редиректит пользователя на Яндекс)
 router.get('/login', (req, res) => {
-  const url = `https://oauth.yandex.ru/authorize?response_type=code&client_id=${YANDEX_CLIENT_ID}&redirect_uri=${encodeURIComponent(YANDEX_REDIRECT_URI)}`;
+  const url = `https://oauth.yandex.ru/authorize?response_type=code&client_id=${YANDEX_CLIENT_ID}&redirect_uri=${encodeURIComponent(YANDEX_REDIRECT_URI)}&force_confirm=1`;
   res.redirect(url);
 });
 
@@ -24,14 +25,20 @@ router.get('/callback/yandex', async (req, res) => {
   if (!code) return res.status(400).send('Нет кода авторизации');
   try {
     // Получаем access_token по коду
-    const tokenRes = await axios.post('https://oauth.yandex.ru/token', null, {
-      params: {
-        grant_type: 'authorization_code',
-        code,
-        client_id: YANDEX_CLIENT_ID,
-        client_secret: YANDEX_CLIENT_SECRET,
-      },
-    });
+    const params = new URLSearchParams();
+    params.append('grant_type', 'authorization_code');
+    params.append('code', code);
+    params.append('client_id', YANDEX_CLIENT_ID);
+    params.append('client_secret', YANDEX_CLIENT_SECRET);
+    const tokenRes = await axios.post(
+      'https://oauth.yandex.ru/token',
+      params.toString(),
+      {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+      }
+    );
     const access_token = tokenRes.data.access_token;
     // Получаем инфу о пользователе
     const userRes = await axios.get('https://login.yandex.ru/info', {
@@ -53,8 +60,9 @@ router.get('/callback/yandex', async (req, res) => {
       sameSite: 'lax',
       maxAge: 1000 * 60 * 60 * 24 * 7,
     });
-    res.redirect('/');
+    res.redirect('http://localhost:3000/');
   } catch (e) {
+    console.error(e); // Выводим ошибку в консоль для диагностики
     await AuditLog.create({ user_id: null, email: null, action: 'login_error', details: e.message, is_error: true });
     res.status(500).send('Ошибка авторизации');
   }

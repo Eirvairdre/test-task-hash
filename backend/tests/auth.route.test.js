@@ -73,7 +73,7 @@ describe('Auth Routes', () => {
         .query({ code: 'test-code' });
 
       expect(response.status).toBe(302);
-      expect(response.header.location).toBe('/');
+      expect(response.header.location).toBe('http://localhost:3000/');
       expect(response.header['set-cookie']).toBeDefined();
       expect(response.header['set-cookie'][0]).toContain('session_token=mock-session-token');
       

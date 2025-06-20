@@ -30,6 +30,19 @@ services:
     networks:
       - hashnet
 
+  frontend:
+    build: ./frontend
+    container_name: hash-frontend
+    restart: unless-stopped
+    env_file:
+      - ./frontend/.env
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - hashnet
+
 volumes:
   db_data:
 

@@ -3,6 +3,7 @@ require('dotenv').config();
 // Импорт основных зависимостей
 const express = require('express');
 const cookieParser = require('cookie-parser');
+const cors = require('cors');
 const sessionMiddleware = require('./middlewares/session');
 const authRoutes = require('./routes/auth');
 const hashRoutes = require('./routes/hash');
@@ -13,6 +14,20 @@ const YAML = require('yamljs');
 const swaggerDocument = YAML.load(__dirname + '/../swagger.yaml');
 // Инициализация Express приложения
 const app = express();
+
+// Настройка CORS для поддержки авторизации через cookie между фронтом и бэком
+app.use(cors({
+  origin: 'http://localhost:3000',
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+}));
+
+// Явная обработка preflight-запросов OPTIONS для всех путей
+app.options('*', cors({
+  origin: 'http://localhost:3000',
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+}));
 
 // Подключаем базовые middleware
 app.use(express.json());                // Парсинг JSON в запросах
