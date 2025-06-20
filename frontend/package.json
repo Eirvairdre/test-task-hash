@@ -17,8 +17,7 @@
     "axios": "^1.6.7",
     "next": "^15.3.4",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "test": "jest --config jest.config.js && jest --config jest.config.middleware.js"
+    "react-dom": "^18.2.0"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.27.2",
